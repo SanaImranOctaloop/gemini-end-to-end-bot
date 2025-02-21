@@ -44,15 +44,11 @@ async def root():
 async def ask_chatbot(request: ChatRequest):
     try:
         response_stream = chat.send_message(request.question, stream=True)
-        
-        # Collect responses from the streamed messages
-        response_text = ""
-        for chunk in response_stream:
-            response_text += chunk.text
-        
+
+        response_text = "".join(chunk.text for chunk in response_stream)
         # Add to chat history
         chat_history.append({"user": request.question, "bot": response_text})
-        
+
         return {"user": request.question, "bot": response_text}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
